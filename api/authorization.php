@@ -20,7 +20,39 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
         echo json_encode(array('status' => false));
         exit;
     }else{
-        //si hay algún usuario con esa publicKey, generamos el token
+        //leemos toda la información del usuario
+        $row = mysqli_fetch_assoc($result);
+
+        //Información a incluir en el token
+        $data = array(
+            'user_id' => $row['id'],
+            'expires' => time() + 3600 // Token expira en una hora (tiempo actual + 3600 segundos)
+        );
+
+        // Convertir la información a formato JSON
+        $jsonData = json_encode($data);
+
+        // Generar el resumen (digest) del mensaje utilizando SHA-256
+        $digest = hash('sha256', $jsonData);
+
+        // Ruta del archivo que contiene la clave privada
+        $privateKeyFile = '/private/privateKey.pem';
+
+        // Leer la clave privada desde el archivo
+        $privateKey = openssl_get_privatekey(file_get_contents($privateKeyFile));
+
+        // Firmar el resumen del mensaje con la clave privada
+        openssl_sign($digest, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+        // Codificar la firma en base64 para obtener una representación legible
+        $encodedSignature = base64_encode($signature);
+
+        // Concatenar el resumen y la firma para formar el token final
+        $token = $digest . '.' . $encodedSignature;
+
+        // Mostrar o devolver el token
+        echo json_encode(array('status' => true, 'token' => $token));
+
     }
 }
 ?>
