@@ -1,1 +1,1 @@
-{"version":1,"defects":{"APITest::testAuthenitcation":4},"times":{"APITest::testAuthenitcation":0.008}}
+{"version":1,"defects":{"APITest::testAuthenitcation":3,"APITest::testUser":4,"APITest::testConstantData":4,"APITest::testConstantTest":3,"APITest::testDataEndpoint":3,"APITest::testTestEndpoint":4},"times":{"APITest::testAuthenitcation":0.037,"APITest::testUser":0.117,"APITest::testConstantData":0.074,"APITest::testConstantTest":0.07,"APITest::testDataEndpoint":2.175,"APITest::testTestEndpoint":0.088}}

@@ -2,11 +2,14 @@
 
 include_once __DIR__.'/../config.php';
 
-//nos aseguramos que sea un post request
+//nos aseguramos que sea un post requestç
+
 if($_SERVER['REQUEST_METHOD'] != 'POST'){
     echo json_encode(array('status' => false));
     exit;
 }else{
+    
+
     //recibimos los datos del post en un json
     $json = file_get_contents('php://input');
     //cogemos la publicKey del json
@@ -36,7 +39,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
         $digest = hash('sha256', $jsonData);
 
         // Ruta del archivo que contiene la clave privada
-        $privateKeyFile = '/private/privateKey.pem';
+        $privateKeyFile = 'http://localhost/AutomotitzacioCapacitatLocomotoraWeb/private/privateKey_unprotected.pem';
 
         // Leer la clave privada desde el archivo
         $privateKey = openssl_get_privatekey(file_get_contents($privateKeyFile));
@@ -49,7 +52,13 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
 
         // Concatenar el resumen y la firma para formar el token final
         $token = $digest . '.' . $encodedSignature;
-
+        //insertem el token a la base de datos
+        //borramos los tokens que ya hayan expirado
+        $sql = "DELETE FROM token WHERE expires < '".date('Y-m-d H:i:s', time())."'";
+        mysqli_query($link, $sql);
+        //caduca en 10 minutos, formato de la fecha: YYYY-MM-DD HH:MM:SS
+        $sql = "INSERT INTO token (token, user, expires) VALUES ('$token', ".$row['id'].", '".date('Y-m-d H:i:s', time() + 600)."')";
+        mysqli_query($link, $sql);
         // Mostrar o devolver el token
         echo json_encode(array('status' => true, 'token' => $token));
 

@@ -1,10 +1,11 @@
 <?php
 
 date_default_timezone_set("Europe/Madrid");
-$host		= getenv('DB_HOST');  // Use Local Host Only       
-$username	= getenv('DB_USERNAME'); 
-$password	=  getenv('DB_PASSWORD');  
-$db_name	= getenv('DB_NAME');  // Database 
+$host		= "localhost";  // Use Local Host Only       
+$username	= "root"; 
+$password	=  "";  
+$db_name	= "capacitatintrinsica";  // Database 
+
 if(mysqli_connect($host, $username, $password,$db_name)!="") {
  
        $link = mysqli_connect($host, $username, $password,$db_name ); 
@@ -15,4 +16,6 @@ if(mysqli_connect($host, $username, $password,$db_name)!="") {
          exit;
 
 }
+
+
 ?>
