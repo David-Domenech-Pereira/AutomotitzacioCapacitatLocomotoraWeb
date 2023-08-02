@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Upload files via FTP
-        uses: appleboy/ftp-action@v1
+        uses: SamKirkland/FTP-Deploy-Action@3.1.1
         with:
           server: ${{ secrets.FTP_SERVER }}  #  configurar este secreto en la configuración del repositorio
           username: ${{ secrets.FTP_USERNAME }}  #  configurar este secreto en la configuración del repositorio
