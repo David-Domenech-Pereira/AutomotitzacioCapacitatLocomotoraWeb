@@ -13,16 +13,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Print current directory
-        run: |
-          pwd
-          ls -la
+     
 
       - name: Upload files via FTP
         uses: SamKirkland/FTP-Deploy-Action@3.1.1
         with:
           ftp-server: ${{ secrets.FTP_SERVER }}  #  configurar este secreto en la configuración del repositorio
           ftp-username: ${{ secrets.FTP_USERNAME }}  #  configurar este secreto en la configuración del repositorio
-          ftp-password: ${{ secrets.FTP_PASSWORD }}  #  configurar este secreto en la configuración del repositorio
-          local-dir: ./  
+          ftp-password: ${{ secrets.FTP_PASSWORD }}  #  configurar este secreto en la configuración del repositorio 
           git-ftp-args: --auto-init  # Argumentos adicionales para git-ftp si los necesitas
