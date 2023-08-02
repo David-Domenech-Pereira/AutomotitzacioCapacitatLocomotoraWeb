@@ -20,5 +20,5 @@ jobs:
           ftp-server: ${{ secrets.FTP_SERVER }}  #  configurar este secreto en la configuración del repositorio
           ftp-username: ${{ secrets.FTP_USERNAME }}  #  configurar este secreto en la configuración del repositorio
           ftp-password: ${{ secrets.FTP_PASSWORD }}  #  configurar este secreto en la configuración del repositorio
-          local-dir: ./../  
+          local-dir: ./AutomotitzacioCapacitatLocomotoraWeb  
           git-ftp-args: --auto-init  # Argumentos adicionales para git-ftp si los necesitas
