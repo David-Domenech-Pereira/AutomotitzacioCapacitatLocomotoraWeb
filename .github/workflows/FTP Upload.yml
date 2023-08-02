@@ -13,6 +13,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Print current directory
+        run: |
+          pwd
+          ls -la
 
       - name: Upload files via FTP
         uses: SamKirkland/FTP-Deploy-Action@3.1.1
