@@ -127,8 +127,10 @@ class APITest extends TestCase
         //guardamos el response
         $response = curl_exec($ch);
         curl_close($ch);
+        
         //comprobamos que nos ha mandado un token
         $response = json_decode($response, true);
+        
         //miramos si status es true
         $this->assertTrue($response['status']);
         //guardamos el token

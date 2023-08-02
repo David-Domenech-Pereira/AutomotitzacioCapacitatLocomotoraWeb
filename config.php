@@ -2,9 +2,9 @@
 
 date_default_timezone_set("Europe/Madrid");
 $host		= "localhost";  // Use Local Host Only       
-$username	= "root"; 
-$password	=  "";  
-$db_name	= "capacitatintrinsica";  // Database 
+$username	= "id21103083_root"; 
+$password	=  "URVESLAMILLOR@1a";  
+$db_name	= "id21103083_capacitatintrinsica";  // Database 
 
 if(mysqli_connect($host, $username, $password,$db_name)!="") {
  
