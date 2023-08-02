@@ -27,7 +27,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
     $height = $json['height'];
     $weight = $json['age'];
     //insertamos los datos en la base de datos
-    $sql = "INSERT INTO User (height, age, publicKey) VALUES ($height, $weight, '$publicKey')";
+    $sql = "INSERT INTO user (height, age, publicKey) VALUES ($height, $weight, '$publicKey')";
     mysqli_query($link, $sql);
     //devolvemos la publicKey
     echo json_encode(array('status' => true, 'publicKey' => $publicKey));

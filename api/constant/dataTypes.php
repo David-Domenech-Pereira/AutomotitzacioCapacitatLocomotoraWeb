@@ -17,14 +17,14 @@
 */
 //nos aseguramos que sea un get request
 if($_SERVER['REQUEST_METHOD'] != 'GET'){
-    echo json_encode(array('status' => false));
+    echo json_encode(array('status' => false, 'error' => 'Método HTTP no válido'));
     exit;
 }else{
     include_once __DIR__.'/../auth_logic.php';
     //comprobamos que el authorization bearer sea un token correcto
     $headers = apache_request_headers();
     if(!isset($headers['Authorization'])){
-        echo json_encode(array('status' => false));
+        echo json_encode(array('status' => false, 'error' => 'Token no encontrado'));
         exit;
     }
     $token = $headers['Authorization'];
@@ -36,15 +36,15 @@ if($_SERVER['REQUEST_METHOD'] != 'GET'){
     include __DIR__.'/../../config.php';
     //miramos en la tabla DataType
     $sql = "SELECT * FROM typesofdata";
-    $result = mysqli_query($link, $sql);
+    $result = $link->query($sql);
     //si no hay ningún usuario con esa publicKey, devolvemos un json con status false
-    if(mysqli_num_rows($result) == 0){
+    if($result->num_rows == 0){
         echo json_encode(array('status' => false));
         exit;
     }else{
         //leemos toda la información del usuario
         $data = array();
-        while($row = mysqli_fetch_assoc($result)){
+        while($row = $result->fetch_assoc()){
             $data[] = $row;
         }
         echo json_encode(array('status' => true, 'Data' => $data));

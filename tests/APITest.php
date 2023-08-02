@@ -298,6 +298,7 @@ Donde recibimos
         curl_close($ch);
         //comprobamos que nos ha mandado un token
         $response = json_decode($response, true);
+
         //miramos si status es true
         $this->assertTrue($response['status']);
         //guardamos el token
@@ -307,7 +308,7 @@ Donde recibimos
         //testType=1
         //start = timestamp aleatorio entre 0 y 1009999900
         //end = start + 100000
-        $ch = curl_init('http://localhost/AutomotitzacioCapacitatLocomotoraWeb/api/testData.php?testType=1&start=' . rand(0, 1009999900) . '&end=' . (rand(0, 1009999900) + 100000));
+        $ch = curl_init('http://localhost/AutomotitzacioCapacitatLocomotoraWeb/api/testData.php?testType=1&start=' . rand(0, 1009999900));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: ' . $token));
         //guardamos el response
@@ -318,6 +319,17 @@ Donde recibimos
         //comprobamos que nos ha mandado un status "ok"
         $response = json_decode($response, true);
         $this->assertEquals('ok', $response['status']);
-        
-    }
+        //mandamos el end
+        $ch = curl_init('http://localhost/AutomotitzacioCapacitatLocomotoraWeb/api/testData.php?testType=1&end=' .(rand(0, 1009999900) + 100000));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: ' . $token));
+        //guardamos el response
+        $response = curl_exec($ch);
+        curl_close($ch);
+        //guardamos el response en respose.json
+        file_put_contents('constantTest_response.json', $response);
+        //comprobamos que nos ha mandado un status "ok"
+        $response = json_decode($response, true);
+        $this->assertEquals('ok', $response['status']);
+    }   
 }

@@ -1,1 +1,7 @@
-{"status":true,"publicKey":"d92c8ecf7382b47ae908b37d535e9126"}
+<br />
+<b>Fatal error</b>:  Uncaught mysqli_sql_exception: Access denied for user 'id21103083_root'@'localhost' (using password: YES) in C:\xampp\htdocs\AutomotitzacioCapacitatLocomotoraWeb\config.php:9
+Stack trace:
+#0 C:\xampp\htdocs\AutomotitzacioCapacitatLocomotoraWeb\config.php(9): mysqli_connect('localhost', 'id21103083_root', Object(SensitiveParameterValue), 'id21103083_capa...')
+#1 C:\xampp\htdocs\AutomotitzacioCapacitatLocomotoraWeb\api\user.php(21): include('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in <b>C:\xampp\htdocs\AutomotitzacioCapacitatLocomotoraWeb\config.php</b> on line <b>9</b><br />

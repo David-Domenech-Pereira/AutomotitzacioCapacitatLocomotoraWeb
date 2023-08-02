@@ -18,25 +18,35 @@ Donde respondemos
 */
 //nos aseguramos que sea un post request
 if($_SERVER['REQUEST_METHOD'] != 'POST'){
-    echo json_encode(array('status' => false));
+    echo json_encode(array('status' => false, 'error' => 'Método de petición incorrecto'));
     exit;
 }else{
     include_once __DIR__.'/auth_logic.php';
     //comprobamos que el authorization bearer sea un token correcto
     $headers = apache_request_headers();
+    //si hay el authorization, lo cogemos
+    if(isset($headers['authorization'])){
+        $headers['Authorization'] = $headers['authorization'];
+    }
     if(!isset($headers['Authorization'])){
-        echo json_encode(array('status' => false));
+        echo json_encode(array('status' => false, 'error' => 'Token no encontrado', 'headers' => json_encode($headers)));
         exit;
     }
     $token = $headers['Authorization'];
     $customer = token_ok($token);
     if($customer<0){
-        echo json_encode(array('status' => false, 'error' => 'Token incorrecto'));
+        echo json_encode(array('status' => false, 'error' => 'Token incorrecto','Token:'=>$token));
         exit;
     }
     //insertamos los datos en la base de datos
     include __DIR__.'/../config.php';
     $data = json_decode(file_get_contents('php://input'), true);
+    //guardamos el json que nos llega
+    $json = json_encode($data);
+    //guardamos el json en un archivo
+    $file = fopen('data.json', 'w');
+    fwrite($file, $json);
+    fclose($file);
     $sensor = $data['sensor'];
     $data = $data['data'];
     $valuesRecieved = 0;

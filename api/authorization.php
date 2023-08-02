@@ -1,14 +1,14 @@
 <?php
 
-include_once __DIR__.'/../config.php';
+include_once __DIR__ . '/../config.php';
 
 //nos aseguramos que sea un post requestç
 
-if($_SERVER['REQUEST_METHOD'] != 'POST'){
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     echo json_encode(array('status' => false));
     exit;
-}else{
-    
+} else {
+
 
     //recibimos los datos del post en un json
     $json = file_get_contents('php://input');
@@ -16,16 +16,17 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
     $json = json_decode($json, true);
     $publickey = $json['publicKey'];
     //miramos en la tabla User si hay algún usuario con esa publicKey
-    $sql = "SELECT * FROM User WHERE publicKey = '$publickey'";
-    $result = mysqli_query($link, $sql);
-    //si no hay ningún usuario con esa publicKey, devolvemos un json con status false
-    if(mysqli_num_rows($result) == 0){
-        echo json_encode(array('status' => false));
-        exit;
-    }else{
-        //leemos toda la información del usuario
-        $row = mysqli_fetch_assoc($result);
+    $sql = "SELECT * FROM user WHERE publicKey = '$publickey'";
+    $result = $link->query($sql);
+    if (!isset($result)||$result->num_rows == 0) {
 
+        echo json_encode(array('status' => false, 'error' => 'Public key incorrecta', 'sql' => $sql));
+        exit;
+    } else {
+        //leemos toda la información del usuario
+        $row = $result->fetch_assoc();
+        //ponemos la hora de España
+        date_default_timezone_set('Europe/Madrid');
         //Información a incluir en el token
         $data = array(
             'user_id' => $row['id'],
@@ -39,7 +40,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
         $digest = hash('sha256', $jsonData);
 
         // Ruta del archivo que contiene la clave privada
-        $privateKeyFile = 'http://localhost/AutomotitzacioCapacitatLocomotoraWeb/private/privateKey_unprotected.pem';
+        $privateKeyFile = __DIR__.'/../private/privateKey_unprotected.pem';
 
         // Leer la clave privada desde el archivo
         $privateKey = openssl_get_privatekey(file_get_contents($privateKeyFile));
@@ -52,16 +53,16 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
 
         // Concatenar el resumen y la firma para formar el token final
         $token = $digest . '.' . $encodedSignature;
+        //lo limitamos a 500 carácteres
+        $token = substr($token, 0, 500);
         //insertem el token a la base de datos
         //borramos los tokens que ya hayan expirado
-        $sql = "DELETE FROM token WHERE expires < '".date('Y-m-d H:i:s', time())."'";
+        $sql = "DELETE FROM token WHERE expires < '" . date('Y-m-d H:i:s', time()) . "'";
         mysqli_query($link, $sql);
         //caduca en 10 minutos, formato de la fecha: YYYY-MM-DD HH:MM:SS
-        $sql = "INSERT INTO token (token, user, expires) VALUES ('$token', ".$row['id'].", '".date('Y-m-d H:i:s', time() + 600)."')";
+        $sql = "INSERT INTO token (token, user, expires) VALUES ('$token', " . $row['id'] . ", '" . date('Y-m-d H:i:s', time() + 600) . "')";
         mysqli_query($link, $sql);
         // Mostrar o devolver el token
         echo json_encode(array('status' => true, 'token' => $token));
-
     }
 }
-?>
