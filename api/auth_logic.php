@@ -7,7 +7,7 @@ function token_ok($token){
     $sql = "SELECT * FROM token WHERE token = '$token' AND expires >= '".date('Y-m-d H:i:s', time())."'";
     $result = $link->query($sql);
     //si no hay ningún usuario con ese token, devolvemos -1, de otro modo devolvemos el valor de user
-    if($result->num_rows == 0){
+    if(!isset($result)||$result===false||$result->num_rows == 0){
         return -1;
     }else{
               $row =  $result->fetch_assoc();

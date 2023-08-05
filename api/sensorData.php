@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 /*Recibimos el siguiente JSON:
 {
     "sensor":1,
@@ -16,8 +17,10 @@ Donde respondemos
 }
 
 */
+http_response_code(500);
 //nos aseguramos que sea un post request
 if($_SERVER['REQUEST_METHOD'] != 'POST'){
+    http_response_code(405);
     echo json_encode(array('status' => false, 'error' => 'Método de petición incorrecto'));
     exit;
 }else{
@@ -29,12 +32,14 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
         $headers['Authorization'] = $headers['authorization'];
     }
     if(!isset($headers['Authorization'])){
+        http_response_code(401);
         echo json_encode(array('status' => false, 'error' => 'Token no encontrado', 'headers' => json_encode($headers)));
         exit;
     }
     $token = $headers['Authorization'];
     $customer = token_ok($token);
     if($customer<0){
+        http_response_code(401);
         echo json_encode(array('status' => false, 'error' => 'Token incorrecto','Token:'=>$token));
         exit;
     }
@@ -52,12 +57,12 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
     $valuesRecieved = 0;
     foreach($data as $d){
         $timestamp = $d['timestamp'];
-        //convertimos el timestamp a un formato legible
-        $timestamp = date('Y-m-d H:i:s', $timestamp);
+        //dejamos el timestamp como un double
         $values = $d['values'];
         $index = 0;
         foreach($values as $v){
-
+            //los valores son de tipo float
+            $v = floatval($v);
             $sql = "INSERT INTO data (user, type, time, value, `index`) VALUES ('$customer', '$sensor', '$timestamp', '$v',$index)";
             
             $result = mysqli_query($link, $sql);
@@ -68,6 +73,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
         }
     }
     //devolvemos
+    http_response_code(200);
     echo json_encode(array('status' => true, 'valuesRecieved' => $valuesRecieved));
 }
 ?>

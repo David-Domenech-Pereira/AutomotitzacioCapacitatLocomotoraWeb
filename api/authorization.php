@@ -5,7 +5,7 @@ include_once __DIR__ . '/../config.php';
 //nos aseguramos que sea un post requestç
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    echo json_encode(array('status' => false));
+    echo json_encode(array('status' => false, 'error' => 'Método de petición incorrecto','METHOD' => $_SERVER['REQUEST_METHOD']));
     exit;
 } else {
 
@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 
         // Concatenar el resumen y la firma para formar el token final
         $token = $digest . '.' . $encodedSignature;
-        //lo limitamos a 500 carácteres
-        $token = substr($token, 0, 500);
+        //lo limitamos a 50 carácteres
+        $token = substr($token, 0, 50);
         //insertem el token a la base de datos
         //borramos los tokens que ya hayan expirado
         $sql = "DELETE FROM token WHERE expires < '" . date('Y-m-d H:i:s', time()) . "'";

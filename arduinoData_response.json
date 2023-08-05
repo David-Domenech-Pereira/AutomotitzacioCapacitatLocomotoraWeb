@@ -1,0 +1,6 @@
+<br />
+<b>Fatal error</b>:  Uncaught mysqli_sql_exception: Duplicate entry '1-1691242000-1-0' for key 'PRIMARY' in C:\xampp\htdocs\AutomotitzacioCapacitatLocomotoraWeb\api\sensorData.php:68
+Stack trace:
+#0 C:\xampp\htdocs\AutomotitzacioCapacitatLocomotoraWeb\api\sensorData.php(68): mysqli_query(Object(mysqli), 'INSERT INTO dat...')
+#1 {main}
+  thrown in <b>C:\xampp\htdocs\AutomotitzacioCapacitatLocomotoraWeb\api\sensorData.php</b> on line <b>68</b><br />

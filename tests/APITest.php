@@ -332,4 +332,56 @@ Donde recibimos
         $response = json_decode($response, true);
         $this->assertEquals('ok', $response['status']);
     }   
+    public function testArduinoInput(){
+        //tenemos el archivo data.json con los datos de prueba
+        //se hace un POST request con el archivo data.json al endpoint sensorData.php
+        //se comprueba que el status es ok
+        //se comprueba que el valuesRecieved es los valores del archivo data.json
+        //pedimos el token del usuario con publicKey "TOKENDEPROVA"
+        $json = array(
+            'publicKey' => "TOKENDEPROVA"
+        );
+        //hacemos el post request
+        $ch = curl_init('http://localhost/AutomotitzacioCapacitatLocomotoraWeb/api/authorization.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        //guardamos el response
+        $response = curl_exec($ch);
+        curl_close($ch);
+        //comprobamos que nos ha mandado un token
+        $response = json_decode($response, true);
+
+        //miramos si status es true
+        $this->assertTrue($response['status']);
+        $token = $response['token'];
+        //hacemos el POST request con el authorization del json indiciado
+        $ch = curl_init('http://localhost/AutomotitzacioCapacitatLocomotoraWeb/api/sensorData.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents('data.json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: ' . $token));
+        //POST request
+        $response = curl_exec($ch);
+        file_put_contents('arduinoData_response.json', $response);
+        //lo descodificamos
+        echo $response;
+        $response = json_decode($response, true);
+        //contamos los valores del json original y los del response
+        $values = json_decode(file_get_contents('data.json'), true);
+        $cont = 0;
+        foreach($values["data"] as $data){
+            $cont += count($data["values"]);
+        }
+        
+        //comprobamos que nos ha mandado un status ok
+        $this->assertEquals('ok', $response['status']);
+        //comprobamos que nos ha mandado un valuesRecieved
+        $this->assertArrayHasKey('valuesRecieved', $response);
+        //comprobamos que valuesRecieved es un int
+        $this->assertIsInt($response['valuesRecieved']);
+        //comprobamos que valuesRecieved es igual a $cont
+        $this->assertEquals($cont, $response['valuesRecieved']);
+
+
+    }
 }
