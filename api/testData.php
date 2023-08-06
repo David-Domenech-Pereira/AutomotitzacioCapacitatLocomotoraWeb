@@ -33,11 +33,7 @@ if($_SERVER['REQUEST_METHOD'] != 'GET'){
     }
     //insertamos el test en la base de datos
     include __DIR__.'/../config.php';
-    //nos aseguramos que end sea mayor que start
-    if($_GET['end']<$_GET['start']){
-        echo json_encode(array('status' => false, 'error' => 'End debe ser mayor que start'));
-        exit;
-    }
+    
     //los start y end los ponemos en formao YYYY-MM-DD HH:MM:SS
     //SI SOLO NOS MANDAN EL END
     if(!isset($_GET['start'])){
@@ -54,9 +50,9 @@ if($_SERVER['REQUEST_METHOD'] != 'GET'){
     $sql = "INSERT INTO test (type, start, end, user) VALUES ('".$_GET['testType']."', '".$_GET['start']."', NULL, '$user')";
     $result = mysqli_query($link, $sql);
     if($result){
-        echo json_encode(array('status' => "ok"));
+        echo json_encode(array('status' => true));
     }else{
-        echo json_encode(array('status' => false, 'error' => 'Error en la base de datos'));
+        echo json_encode(array('status' => false, 'error' => 'Error en la base de datos', 'sql' => $sql));
     }
     }
     
