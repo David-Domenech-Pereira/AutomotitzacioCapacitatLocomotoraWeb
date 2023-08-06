@@ -55,12 +55,15 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         $token = $digest . '.' . $encodedSignature;
         //lo limitamos a 50 carácteres
         $token = substr($token, 0, 50);
+        //le quitamos { y } para que no haya problemas con el json
+        $token = str_replace("{", "", $token);
+        $token = str_replace("}", "", $token);
         //insertem el token a la base de datos
         //borramos los tokens que ya hayan expirado
         $sql = "DELETE FROM token WHERE expires < '" . date('Y-m-d H:i:s', time()) . "'";
         mysqli_query($link, $sql);
         //caduca en 10 minutos, formato de la fecha: YYYY-MM-DD HH:MM:SS
-        $sql = "INSERT INTO token (token, user, expires) VALUES ('$token', " . $row['id'] . ", '" . date('Y-m-d H:i:s', time() + 600) . "')";
+        $sql = "INSERT INTO token (token, user, expires) VALUES ('$token', " . $row['id'] . ", '" . date('Y-m-d H:i:s', time() + 1600) . "')";
         mysqli_query($link, $sql);
         // Mostrar o devolver el token
         echo json_encode(array('status' => true, 'token' => $token));

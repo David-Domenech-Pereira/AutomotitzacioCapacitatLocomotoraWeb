@@ -53,10 +53,20 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
     fwrite($file, $json);
     fclose($file);
     $sensor = $data['sensor'];
+    if(isset($data["start"])){
+    $start = $data['start'];
+    }
     $data = $data['data'];
     $valuesRecieved = 0;
     foreach($data as $d){
-        $timestamp = $d['timestamp'];
+        if(isset($start)){
+            //ens passen ms a sumar
+            $timestamp = $start + round($d["timestamp"]/1000,2);
+        }else{
+            //ens passen segons
+            $timestamp = $d['timestamp'];
+        }
+      
         //dejamos el timestamp como un double
         $values = $d['values'];
         $index = 0;
@@ -72,8 +82,19 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
             }
         }
     }
-    //devolvemos
-    http_response_code(200);
-    echo json_encode(array('status' => true, 'valuesRecieved' => $valuesRecieved));
+    if($valuesRecieved>0){
+        //guardamos el json en un archivo
+        $file = fopen('correct_data.json', 'w');
+        fwrite($file, $json);
+        fclose($file);
+        //devolvemos
+        http_response_code(200);
+        echo json_encode(array('status' => true, 'valuesRecieved' => $valuesRecieved));
+    }else{
+        //devolvemos codigo de error
+        http_response_code(500);
+        echo json_encode(array('status' => false, 'valuesRecieved' => $valuesRecieved,'sql'=>$sql));
+    }
+    
 }
 ?>
