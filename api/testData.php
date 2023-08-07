@@ -27,7 +27,7 @@ if($_SERVER['REQUEST_METHOD'] != 'GET'){
         exit;
     }
     //miramos que estén los parámetros necesarios
-    if(!isset($_GET['testType'])){
+    if(!isset($_GET['testType'])||(!isset($_GET['start'])&&!isset($_GET['end']))){
         echo json_encode(array('status' => false, 'error' => 'Faltan parámetros'));
         exit;
     }
@@ -37,12 +37,18 @@ if($_SERVER['REQUEST_METHOD'] != 'GET'){
     //los start y end los ponemos en formao YYYY-MM-DD HH:MM:SS
     //SI SOLO NOS MANDAN EL END
     if(!isset($_GET['start'])){
+        $_GET['end']=round($_GET['end']/1000,2);
         $_GET['end'] = date("Y-m-d H:i:s", $_GET['end']);
        //hacemos un update
        $sql = "UPDATE test SET end = '".$_GET['end']."' WHERE user = '$user' AND end IS NULL";
-       $link->query($sql);
-       echo json_encode(array('status' => "ok"));
+       $result = $link->query($sql);
+       if($result){
+        echo json_encode(array('status' => true,'msg'=>"Test finalizado"));
+       }else{
+        echo json_encode(array('status' => false, 'error' => 'Error en la base de datos', 'sql' => $sql));
+       }
     }else{
+        $_GET['start']=round($_GET['start']/1000,2);
         $_GET['start'] = date("Y-m-d H:i:s", $_GET['start']);
     
 

@@ -66,7 +66,9 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
             //ens passen segons
             $timestamp = $d['timestamp'];
         }
-      
+        if(isset($_GET["ms"])&&!isset($start)){
+            $timestamp = round($timestamp/1000,2);
+        }
         //dejamos el timestamp como un double
         $values = $d['values'];
         $index = 0;
