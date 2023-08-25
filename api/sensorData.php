@@ -62,10 +62,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
     $i = 0;
     $previous = 0;
     foreach($data as $d){
-        if($i>0){
-            $sql .= ",";
-        }
-        $i++;
+        
         if(isset($start)){
             //ens passen ms a sumar
             $timestamp = $start + round($d["timestamp"]/1000,2);
@@ -78,8 +75,12 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
         }
         if($timestamp == $previous){
             //si el timestamp es igual que el anterior, le sumamos 1 microsegundo
-            $timestamp += 0.001;
+            continue;
         }
+        if($i>0){
+            $sql .= ",";
+        }
+        $i++;
         $previous = $timestamp;
         //dejamos el timestamp como un double
         $values = $d['values'];
