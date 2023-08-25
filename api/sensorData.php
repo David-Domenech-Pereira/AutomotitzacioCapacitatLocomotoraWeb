@@ -58,7 +58,14 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
     }
     $data = $data['data'];
     $valuesRecieved = 0;
+    $sql = "INSERT INTO data (user, type, time, value, `index`) VALUES ";
+    $i = 0;
+    $previous = 0;
     foreach($data as $d){
+        if($i>0){
+            $sql .= ",";
+        }
+        $i++;
         if(isset($start)){
             //ens passen ms a sumar
             $timestamp = $start + round($d["timestamp"]/1000,2);
@@ -67,24 +74,40 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
             $timestamp = $d['timestamp'];
         }
         if(isset($_GET["ms"])&&!isset($start)){
-            $timestamp = round($timestamp/1000,2);
+            $timestamp = round($timestamp/1000,6);
         }
+        if($timestamp == $previous){
+            //si el timestamp es igual que el anterior, le sumamos 1 microsegundo
+            $timestamp += 0.001;
+        }
+        $previous = $timestamp;
         //dejamos el timestamp como un double
         $values = $d['values'];
+       
         $index = 0;
+      
         foreach($values as $v){
             //los valores son de tipo float
             $v = floatval($v);
-            $sql = "INSERT INTO data (user, type, time, value, `index`) VALUES ('$customer', '$sensor', '$timestamp', '$v',$index)";
-            
-            $result = mysqli_query($link, $sql);
-            if($result){
-                $valuesRecieved++;
-                $index++;
+            if($index>0){
+                $sql .= ",";
             }
+            $sql .= "('$customer', '$sensor', '$timestamp', '$v',$index)";
+           
+        
+            $valuesRecieved++;
+            $index++;
+            
         }
+        
+        
     }
+   
     if($valuesRecieved>0){
+        //guardamos la query en un archivo al final
+        $file = fopen('../query.sql', 'a');
+        fwrite($file, $sql.";\n");
+        fclose($file);
         //guardamos el json en un archivo
         $file = fopen('correct_data.json', 'w');
         fwrite($file, $json);
