@@ -22,8 +22,10 @@ include 'config.php';
                 echo "<p>".$row2["name"]."</p>";
                 //pasamos start y end a timestamp
                 $row["start"] = strtotime($row["start"]);
+              
                 $row["end"] = strtotime($row["end"]);
-                show_graph_dates($row["start"],$row["end"],$row["type"],$row["user"]);
+            
+                show_graph_dates($row["start"],$row["end"],2,$row["user"]);
                 echo "<hr>";
             }
         }
@@ -46,7 +48,7 @@ $todayEnd = strtotime('tomorrow midnight')-1;
 
 function show_graph_dates($start,$end,$type,$user = 1){
     include 'config.php';
-    $sql = "SELECT * FROM data WHERE user=$user AND time BETWEEN $start AND $end AND type=$type ORDER BY time ASC";
+    $sql = "SELECT * FROM data WHERE user=$user AND time > $start AND time < $end AND type=$type ORDER BY time ASC";
 
     $result = $link->query($sql);
     $data = array();
@@ -72,7 +74,7 @@ function show_graph_dates($start,$end,$type,$user = 1){
                 }
                 //para guardarlo hay que sumarle 2 horas
                 $date = new DateTime($minuto);
-                $date->add(new DateInterval('PT2H'));
+
                 $times[] = $date->format('H:i:s');
                 $prev_minuto = $minuto;
             }
@@ -94,14 +96,14 @@ function show_graph_dates($start,$end,$type,$user = 1){
         if(isset($minuto)){
         //para guardarlo hay que sumarle 2 horas
         $date = new DateTime($minuto);
-        $date->add(new DateInterval('PT2H'));
-        $times[] = $date->format('H:i');
+
+        $times[] = $date->format('H:i:s');
         }
     }
     if(isset($minuto)){
-$id = time();
+$id = rand(0,100000) % 1000000;
 echo "
-<hr>
+
 
 <canvas id=\"myChart_$id\" width=\"1500\" height=\"1050\"></canvas>
 <script>
