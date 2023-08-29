@@ -45,82 +45,15 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
     }
     //insertamos los datos en la base de datos
     include __DIR__.'/../config.php';
-    $data = json_decode(file_get_contents('php://input'), true);
-    //guardamos el json que nos llega
-    $json = json_encode($data);
-    //guardamos el json en un archivo
-    $file = fopen('data.json', 'w');
-    fwrite($file, $json);
-    fclose($file);
-    $sensor = $data['sensor'];
-    if(isset($data["start"])){
-    $start = $data['start'];
-    }
-    $data = $data['data'];
-    $valuesRecieved = 0;
-    $sql = "INSERT INTO data (user, type, time, value, `index`) VALUES ";
-    $i = 0;
-    $previous = 0;
-    foreach($data as $d){
-        
-        if(isset($start)){
-            //ens passen ms a sumar
-            $timestamp = $start + round($d["timestamp"]/1000,2);
-        }else{
-            //ens passen segons
-            $timestamp = $d['timestamp'];
-        }
-        if(isset($_GET["ms"])&&!isset($start)){
-            $timestamp = round($timestamp/1000,6);
-        }
-        if($timestamp == $previous){
-            //si el timestamp es igual que el anterior, le sumamos 1 microsegundo
-            continue;
-        }
-        if($i>0){
-            $sql .= ",";
-        }
-        $i++;
-        $previous = $timestamp;
-        //dejamos el timestamp como un double
-        $values = $d['values'];
-       
-        $index = 0;
-      
-        foreach($values as $v){
-            //los valores son de tipo float
-            $v = floatval($v);
-            if($index>0){
-                $sql .= ",";
-            }
-            $sql .= "('$customer', '$sensor', '$timestamp', '$v',$index)";
-           
-        
-            $valuesRecieved++;
-            $index++;
-            
-        }
-        
-        
-    }
-   
-    if($valuesRecieved>0){
-        //guardamos la query en un archivo al final
-        $file = fopen('../query.sql', 'a');
-        fwrite($file, $sql.";\n");
-        fclose($file);
-        //guardamos el json en un archivo
-        $file = fopen('correct_data.json', 'w');
-        fwrite($file, $json);
-        fclose($file);
-        //devolvemos
-        http_response_code(200);
-        echo json_encode(array('status' => true, 'valuesRecieved' => $valuesRecieved));
-    }else{
-        //devolvemos codigo de error
-        http_response_code(500);
-        echo json_encode(array('status' => false, 'valuesRecieved' => $valuesRecieved,'sql'=>$sql));
-    }
+    $file = file_get_contents('php://input');
+    //le ponemos el $customer al json
+    
+    //guardamos el json que nos llega en ../pendingFiles/XX.json
+    $name = rand(0,1000000)."_$customer.json";
+    file_put_contents(__DIR__."/../pendingFiles/".$name,$file);
+    http_response_code(200);
+    echo json_encode(array('status' => true, 'msg' => 'Datos recibidos correctamente', 'fileName'=>$name));
+    
     
 }
 ?>

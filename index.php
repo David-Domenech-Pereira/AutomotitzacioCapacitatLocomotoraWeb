@@ -24,8 +24,11 @@ include 'config.php';
                 $row["start"] = strtotime($row["start"]);
               
                 $row["end"] = strtotime($row["end"]);
-            
-                show_graph_dates($row["start"],$row["end"],2,$row["user"]);
+                //al end le añadimos 30 segundos para que se vea mejor
+                if($row["type"]==2){
+                $row["end"] += 30;
+                }
+                show_graph_dates($row["start"],$row["end"],2,$row["user"],false);
                 echo "<hr>";
             }
         }
@@ -46,7 +49,7 @@ $todayEnd = strtotime('tomorrow midnight')-1;
 }
 
 
-function show_graph_dates($start,$end,$type,$user = 1){
+function show_graph_dates($start,$end,$type,$user = 1,$avg=true){
     include 'config.php';
     $sql = "SELECT * FROM data WHERE user=$user AND time > $start AND time < $end AND type=$type ORDER BY time ASC";
 
@@ -64,7 +67,7 @@ function show_graph_dates($start,$end,$type,$user = 1){
             //si no, coger el primero
             //si no, coger el último
             $minuto = date("H:i:s",round($row["time"],0));
-           
+           if($avg){
             if($minuto!=$prev_minuto){
                 //hacemos el promedio de los valores de este minuto y los guardamos en el array $data
                 if(isset($arr["index"][$prev_minuto])){
@@ -86,7 +89,26 @@ function show_graph_dates($start,$end,$type,$user = 1){
                 $arr["index"][$minuto]++;
                 $arr["value"][$minuto][$row["index"]] += $row["value"];
             }
-           
+        }else{
+            //no hacemos el promedio
+            if(!isset($row["index"][$minuto])){
+                $arr["index"][$minuto] = 1;
+                $arr["value"][$minuto][$row["index"]] = $row["value"];
+            }else{
+                $arr["index"][$minuto]++;
+                $arr["value"][$minuto][$row["index"]] += $row["value"];
+            }
+           if($row["index"] == 2){
+            $data[0][] = $arr["value"][$minuto][0];
+            $data[1][] = $arr["value"][$minuto][1];
+            $data[2][] = $arr["value"][$minuto][2];
+            $date = new DateTime($minuto);
+
+            $times[] = $date->format('H:i:s');
+            $prev_minuto = $minuto;
+           }
+          
+        }
         }
         if(isset($arr["index"][$prev_minuto])){
             $data[0][] = $arr["value"][$prev_minuto][0]/$arr["index"][$prev_minuto];
@@ -105,7 +127,7 @@ $id = rand(0,100000) % 1000000;
 echo "
 
 
-<canvas id=\"myChart_$id\" width=\"1500\" height=\"1050\"></canvas>
+<canvas id=\"myChart_$id\" width=\"800\" height=\"500\"></canvas>
 <script>
     // Sample data for x, y, z values over time
 const data_$id = {";

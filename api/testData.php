@@ -37,7 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] != 'GET') {
     //los start y end los ponemos en formao YYYY-MM-DD HH:MM:SS
     //SI SOLO NOS MANDAN EL END
     if (!isset($_GET['start'])) {
+        if(!isset($_GET["float"])){
         $_GET['end'] = round($_GET['end'] / 1000, 2);
+        }
         $_GET['end'] = date("Y-m-d H:i:s", $_GET['end']);
         //hacemos un update
         $sql = "UPDATE test SET end = '" . $_GET['end'] . "' WHERE user = '$user' AND end IS NULL AND type='" . $_GET['testType'] . "'";
@@ -48,7 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             echo json_encode(array('status' => false, 'error' => 'Error en la base de datos', 'sql' => $sql));
         }
     } else {
+        if(!isset($_GET["float"])){
         $_GET['start'] = round($_GET['start'] / 1000, 2);
+    }
         $_GET['start'] = date("Y-m-d H:i:s", $_GET['start']);
 
 
